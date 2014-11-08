@@ -97,7 +97,7 @@ def find_davis_ads(indiv_ads):
 										'price':price,
 										'date':date,
 										'bedrooms':num_bedrooms,
-										'url':os.path.join('"http://sacramento.craigslist.org/search/',url)}
+										'url':'"http://sacramento.craigslist.org'+,url}
 	return davis_ads_dict
 
 
