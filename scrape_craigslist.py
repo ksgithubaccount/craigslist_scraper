@@ -10,7 +10,7 @@ from email.mime.multipart import MIMEMultipart
 import os
 
 FILE_LOCATIONS = '/Users/abostroem/Desktop/craigslist_scraper'
-SAVED_RESULTS_FILENAME = "last_run_paloalto.pkl"
+SAVED_RESULTS_FILENAME = "last_run_davis.pkl"
 
 def get_login_credentials():
 	with open(os.path.join(FILE_LOCATIONS,'scraper.config')) as ofile:
@@ -27,7 +27,7 @@ def send_email(message):
     s.starttls()
     username, password = get_login_credentials()
     s.login(username, password)
-    s.sendmail("abostroem@gmail.com",["abostroem@gmail.com", "yybar85712@gmail.com"], msg.as_string())
+    s.sendmail("abostroem@gmail.com",["abostroem@gmail.com"], msg.as_string())
     s.quit()
 
 def read_in_files(filename):
