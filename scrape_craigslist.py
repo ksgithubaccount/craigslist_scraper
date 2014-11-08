@@ -10,6 +10,7 @@ from email.mime.multipart import MIMEMultipart
 import os
 
 FILE_LOCATIONS = '/Users/abostroem/Desktop/craigslist_scraper'
+SAVED_RESULTS_FILENAME = "last_run_paloalto.pkl"
 
 def get_login_credentials():
 	with open(os.path.join(FILE_LOCATIONS,'scraper.config')) as ofile:
@@ -33,7 +34,7 @@ def read_in_files(filename):
 	'''
 	Read html file
 	'''
-	sock = urllib.urlopen("http://sfbay.craigslist.org/search/pen/apa?pets_cat=1")
+	sock = urllib.urlopen("http://sacramento.craigslist.org/search/apa?query=Davis&sale_date=-")
 	htmlSource = sock.read()
 	sock.close()
 	return htmlSource.split('\n')
@@ -85,26 +86,27 @@ def find_davis_ads(indiv_ads):
 		today = datetime.today()
 		this_morning = datetime.strptime('{} {} {}'.format(today.month, today.day, today.year), '%m %d %Y')
 		computer_date = datetime.strptime('{} {} {}'.format(month, day, year), '%m %d %Y')
-		if (((price < 2200) and (price > 500)) and \
+		if (((location == '') and ('davis' in title.lower())) or
+					('davis' in location.lower())) and \
+				(price < 950) and \
 				('room' not in title.lower()) and \
-				('share' not in title.lower()) and
-				(num_bedrooms == '2br')): #and (computer_date > this_morning):
+				('share' not in title.lower()): #and (computer_date > this_morning):
 			ad_num += 1
 			davis_ads_dict[title.replace(' ', '_')] = {'title':title,
 										'location':location,
 										'price':price,
 										'date':date,
 										'bedrooms':num_bedrooms,
-										'url':os.path.join('http://sfbay.craigslist.org/',url)}
+										'url':os.path.join('"http://sacramento.craigslist.org/search/',url)}
 	return davis_ads_dict
 
 
 def pickle_dictionary(davis_ads_dict):
-	with open(os.path.join(FILE_LOCATIONS,'last_run.pkl'), 'w') as ofile:
+	with open(os.path.join(FILE_LOCATIONS,SAVED_RESULTS_FILENAME), 'w') as ofile:
 		pickle.dump(davis_ads_dict, ofile)
 
 def find_new_entries(davis_ads_dict):
-	last_run_file = os.path.join(FILE_LOCATIONS,'last_run.pkl')
+	last_run_file = os.path.join(FILE_LOCATIONS,SAVED_RESULTS_FILENAME)
 
 	if os.path.exists(last_run_file):
 		ofile = open(last_run_file)
@@ -130,7 +132,7 @@ def find_new_entries(davis_ads_dict):
 
 
 def find_new_ads(davis_ads_dict):
-	with open(os.path.join(FILE_LOCATIONS,'last_run.pkl'), 'r') as ofile:
+	with open(os.path.join(FILE_LOCATIONS,SAVED_RESULTS_FILENAME), 'r') as ofile:
 		last_davis_ads_dict = pickle.load(ofile)
 
 def write_log(email_txt):
