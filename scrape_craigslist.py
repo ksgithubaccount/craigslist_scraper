@@ -26,14 +26,14 @@ def send_email(message):
     s.starttls()
     username, password = get_login_credentials()
     s.login(username, password)
-    s.sendmail("abostroem@gmail.com",["abostroem@gmail.com"], msg.as_string())
+    s.sendmail("abostroem@gmail.com",["abostroem@gmail.com", "yybar85712@gmail.com"], msg.as_string())
     s.quit()
 
 def read_in_files(filename):
 	'''
 	Read html file
 	'''
-	sock = urllib.urlopen("http://sacramento.craigslist.org/search/apa?query=Davis&sale_date=-")
+	sock = urllib.urlopen("http://sfbay.craigslist.org/search/pen/apa?pets_cat=1")
 	htmlSource = sock.read()
 	sock.close()
 	return htmlSource.split('\n')
@@ -76,23 +76,26 @@ def find_davis_ads(indiv_ads):
 		except IndexError: #If no price listed
 			price = 0
 		url = ad.split('<a href="')[1].split('" class="i"')[0]
-		date = ad.split('class="date">')[1].split('</span>')[0]
-		month, day = date.split()
-		if float(day) < 10: day = '0'+day
+		try:
+			num_bedrooms = ad.split('class="housing">/')[1].split()[0]
+		except:
+			num_bedrooms = ''
+		date = ad.split('datetime="')[1].split()[0]
+		year,month, day = date.split('-')
 		today = datetime.today()
 		this_morning = datetime.strptime('{} {} {}'.format(today.month, today.day, today.year), '%m %d %Y')
-		computer_date = datetime.strptime('{} {} {}'.format(month, day, today.year), '%b %d %Y')
-		if (((location == '') and ('davis' in title.lower())) or
-					('davis' in location.lower())) and \
-				(price < 950) and \
+		computer_date = datetime.strptime('{} {} {}'.format(month, day, year), '%m %d %Y')
+		if (((price < 2200) and (price > 500)) and \
 				('room' not in title.lower()) and \
-				('share' not in title.lower()): #and (computer_date > this_morning):
+				('share' not in title.lower()) and
+				(num_bedrooms == '2br')): #and (computer_date > this_morning):
 			ad_num += 1
 			davis_ads_dict[title.replace(' ', '_')] = {'title':title,
 										'location':location,
 										'price':price,
 										'date':date,
-										'url':'http://sacramento.craigslist.org'+url}
+										'bedrooms':num_bedrooms,
+										'url':os.path.join('http://sfbay.craigslist.org/',url)}
 	return davis_ads_dict
 
 
@@ -101,17 +104,28 @@ def pickle_dictionary(davis_ads_dict):
 		pickle.dump(davis_ads_dict, ofile)
 
 def find_new_entries(davis_ads_dict):
-	ofile = open(os.path.join(FILE_LOCATIONS,'last_run.pkl'))
-	old_davis_ads_dict = pickle.load(ofile)
-	old_ad_titles = old_davis_ads_dict.keys()
-	email_txt = ''
-	for ad in davis_ads_dict.keys():
-		if ad not in old_ad_titles:
+	last_run_file = os.path.join(FILE_LOCATIONS,'last_run.pkl')
+
+	if os.path.exists(last_run_file):
+		ofile = open(last_run_file)
+		old_davis_ads_dict = pickle.load(ofile)
+		old_ad_titles = old_davis_ads_dict.keys()
+		email_txt = ''
+		for ad in davis_ads_dict.keys():
+			if ad not in old_ad_titles:
+				email_txt += '{} \n\tPrice: {}, \n\tLocation: {}, \n\tDate posted: {}, \
+						\n\tBedrooms: {},\n\tlink: {}\n\n'.format(
+					davis_ads_dict[ad]['title'], davis_ads_dict[ad]['price'],
+					davis_ads_dict[ad]['location'], davis_ads_dict[ad]['date'],
+					davis_ads_dict[ad]['bedrooms'], davis_ads_dict[ad]['url'])
+	else:
+		email_txt = ''
+		for ad in davis_ads_dict.keys():
 			email_txt += '{} \n\tPrice: {}, \n\tLocation: {}, \n\tDate posted: {}, \
-					\n\tlink: {}\n\n'.format(
+					\n\tBedrooms: {},\n\tlink: {}\n\n'.format(
 				davis_ads_dict[ad]['title'], davis_ads_dict[ad]['price'],
 				davis_ads_dict[ad]['location'], davis_ads_dict[ad]['date'],
-				davis_ads_dict[ad]['url'])
+				davis_ads_dict[ad]['bedrooms'], davis_ads_dict[ad]['url'])
 	return email_txt
 
 
