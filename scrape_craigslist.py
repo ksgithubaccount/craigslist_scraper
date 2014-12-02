@@ -27,7 +27,7 @@ def send_email(message):
     s.starttls()
     username, password = get_login_credentials()
     s.login(username, password)
-    s.sendmail("abostroem@gmail.com",["abostroem@gmail.com"], msg.as_string())
+    s.sendmail("abostroem@gmail.com",["abostroem@gmail.com", "cerisesimone@gmail.com"], msg.as_string())
     s.quit()
 
 def read_in_files(filename):
