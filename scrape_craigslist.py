@@ -10,7 +10,7 @@ from email.mime.multipart import MIMEMultipart
 import os
 
 FILE_LOCATIONS = '/Users/abostroem/Desktop/craigslist_scraper'
-SAVED_RESULTS_FILENAME = "last_run_davis.pkl"
+SAVED_RESULTS_FILENAME = "last_run_santa_cruz.pkl"
 
 def get_login_credentials():
 	with open(os.path.join(FILE_LOCATIONS,'scraper.config')) as ofile:
@@ -34,7 +34,7 @@ def read_in_files(filename):
 	'''
 	Read html file
 	'''
-	sock = urllib.urlopen("http://sacramento.craigslist.org/search/apa?query=Davis&sale_date=-")
+	sock = urllib.urlopen("http://sfbay.craigslist.org/search/scz/apa?pets_cat=1")
 	htmlSource = sock.read()
 	sock.close()
 	return htmlSource.split('\n')
@@ -86,18 +86,21 @@ def find_davis_ads(indiv_ads):
 		today = datetime.today()
 		this_morning = datetime.strptime('{} {} {}'.format(today.month, today.day, today.year), '%m %d %Y')
 		computer_date = datetime.strptime('{} {} {}'.format(month, day, year), '%m %d %Y')
-		if (((location == '') and ('davis' in title.lower())) or
-					('davis' in location.lower())) and \
-				(price < 950) and \
-				('room' not in title.lower()) and \
-				('share' not in title.lower()): #and (computer_date > this_morning):
+		#pdb.set_trace()
+		if (((location == '') and (('soquel' not in title.lower()) and ('ben lomond' not in title.lower()))) or \
+			((location.lower() != 'soquel') and (location.lower() != 'ben lomond'))) and \
+			(((num_bedrooms == '1br') and (price < 800.0)) or \
+			((num_bedrooms == '2br') and (price < 2200.0)) or \
+			((num_bedrooms == '3br') and (price < 3000.0))) and \
+			(('room' not in title.lower()) and ('share' not in title.lower())):
+
 			ad_num += 1
 			davis_ads_dict[title.replace(' ', '_')] = {'title':title,
 										'location':location,
 										'price':price,
 										'date':date,
 										'bedrooms':num_bedrooms,
-										'url':'"http://sacramento.craigslist.org'+,url}
+										'url':'http://sfbay.craigslist.org'+url}
 	return davis_ads_dict
 
 
