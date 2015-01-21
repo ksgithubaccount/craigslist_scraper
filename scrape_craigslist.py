@@ -87,10 +87,18 @@ def find_davis_ads(indiv_ads):
 		this_morning = datetime.strptime('{} {} {}'.format(today.month, today.day, today.year), '%m %d %Y')
 		computer_date = datetime.strptime('{} {} {}'.format(month, day, year), '%m %d %Y')
 		#pdb.set_trace()
-		if (((location == '') and (('soquel' not in title.lower()) and ('ben lomond' not in title.lower()) and \
-				 ('felton' not in title.lower()) and ('scotts valley' not in title.lower()))) or \
-			((location.lower() != 'soquel') and (location.lower() != 'ben lomond') and (location.lower() != 'felton') \
-				and (location.lower() != 'scotts valley')) and \
+		if (((location == '') and \
+		    (('soquel' not in title.lower()) and \
+		     ('ben lomond' not in title.lower()) and \
+		     ('watsonville' not in title.lower()) and \
+		     ('felton' not in title.lower()) and \
+		     ('scotts valley' not in title.lower()))) or \
+
+			(('soquel' not in location.lower()) and \
+			 ('ben lomond' not in location.lower()) and \
+			 ('felton' not in location.lower()) and \
+			 ('scotts valley' not in location.lower()) and \
+			 ('watsonville' not in location.lower()))) and \
 			(((num_bedrooms == '1br') and (price < 800.0)) or \
 			((num_bedrooms == '2br') and (price < 2200.0)) or \
 			((num_bedrooms == '3br') and (price < 3000.0))) and \
