@@ -99,9 +99,7 @@ def find_davis_ads(indiv_ads):
 			 ('felton' not in location.lower()) and \
 			 ('scotts valley' not in location.lower()) and \
 			 ('watsonville' not in location.lower()))) and \
-			(((num_bedrooms == '1br') and (price < 800.0)) or \
-			((num_bedrooms == '2br') and (price < 2200.0)) or \
-			((num_bedrooms == '3br') and (price < 3000.0))) and \
+			((num_bedrooms == '1br') and (price < 800.0)) and \
 			(('room' not in title.lower()) and ('share' not in title.lower())):
 
 			ad_num += 1
