@@ -8,6 +8,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
+import keyring
 
 FILE_LOCATIONS = '/Users/abostroem/Desktop/craigslist_scraper'
 SAVED_RESULTS_FILENAME = "last_run_davis.pkl"
@@ -15,6 +16,7 @@ SAVED_RESULTS_FILENAME = "last_run_davis.pkl"
 def get_login_credentials():
 	with open(os.path.join(FILE_LOCATIONS,'scraper.config')) as ofile:
 		config_dict = pickle.load(ofile)
+        config_dict['password'] = keyring.get_password('CraigslistScraper',config_dict['username'])
 	return config_dict['username'], config_dict['password']
 
 def send_email(message):
